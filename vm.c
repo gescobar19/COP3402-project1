@@ -278,6 +278,7 @@ void machine(FILE *fp) {
                 fprintf(stderr, "Trying to pop an empty stack!\n");
                 exit(1);
             }
+            
             fprintf(stderr, "Invariants violated!\n");
             exit(1);
         }
