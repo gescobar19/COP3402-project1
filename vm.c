@@ -77,26 +77,6 @@ void machine(FILE *fp) {
     print_trace(InstructionMemory[0], PC, BP, SP, OPCODE_NAMES, stack, NDB);
     while (1) {
         
-         // Invariant check
-            if (!(0 <= BP) && !(BP <= SP) && !(0 <= SP) && !(SP < MAX_STACK_HEIGHT))
-            {   
-                fprintf(stderr, "Invariants violated!\n");
-                exit(1);
-            }
-            
-            if(!(0 <= PC && PC < MAX_CODE_LENGTH))
-            {   
-                 if((SP - 1) < 0)
-                {
-                    fprintf(stderr, "Trying to pop an empty stack!\n");
-                    exit(1);
-                }
-                
-                fprintf(stderr, "Invariants violated!" );
-                exit(1);
-            }
-        
-        
         switch (InstructionMemory[PC].op) {
             
             // Tracing the stack
@@ -126,11 +106,6 @@ void machine(FILE *fp) {
             // POP
             case 4:
                 SP = SP - 1;
-                if(SP < 0)
-                {
-                    printf("Trying to pop an empty stack!\n");
-                    exit(1);
-                }
                 break;
 
             // PSI
@@ -225,7 +200,7 @@ void machine(FILE *fp) {
             case 19:
                 if(stack[SP - 2] == 0)
                 {
-                    printf("Divisor is zero in DIV instruction!\n");
+                    fprintf(stderr, "Divisor is zero in DIV instruction!\n");
                     exit(1); 
                 }
                 stack[SP - 2] = stack[SP - 1] / stack[SP - 2];
@@ -237,7 +212,7 @@ void machine(FILE *fp) {
             case 20:
                 if (stack[SP - 2] == 0)
                 {
-                    printf("Modulus is zero in MOD instruction!\n");
+                    fprintf(stderr, "Modulus is zero in MOD instruction!\n");
                     exit(1);
                 }
                 stack[SP - 2] = stack[SP - 1] % stack[SP - 2];
@@ -291,6 +266,22 @@ void machine(FILE *fp) {
                 break;
         }
         PC++;
+
+        // Invariant check
+        if (!(0 <= BP) && !(BP <= SP) && !(0 <= SP) && !(SP < MAX_STACK_HEIGHT)){   
+            fprintf(stderr, "Invariants violated!\n");
+            exit(1);
+        }
+        // Invariant check
+        if(!(0 <= PC && PC < MAX_CODE_LENGTH)){   
+            if(SP < 0){
+                fprintf(stderr, "Trying to pop an empty stack!\n");
+                exit(1);
+            }
+            fprintf(stderr, "Invariants violated!\n");
+            exit(1);
+        }
+        
         if (NDB == 0)
             print_trace(InstructionMemory[PC], PC, BP, SP, OPCODE_NAMES, stack, NDB);
         
